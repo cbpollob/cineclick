@@ -275,14 +275,14 @@ $pendingCount = $pending ? $pending->num_rows : 0;
           <small>View all content</small>
         </div>
       </a>
-      <a href="#create-uploader" class="maintenance-btn" onclick="document.getElementById('create-uploader').scrollIntoView({behavior:'smooth'})">
+      <a href="#create-uploader" class="maintenance-btn scroll-link" data-target="create-uploader">
         <span class="icon">➕</span>
         <div class="text">
           <strong>Create Uploader</strong>
           <small>Add new producer</small>
         </div>
       </a>
-      <a href="#pending-requests" class="maintenance-btn" onclick="document.getElementById('pending-requests').scrollIntoView({behavior:'smooth'})">
+      <a href="#pending-requests" class="maintenance-btn scroll-link" data-target="pending-requests">
         <span class="icon">📋</span>
         <div class="text">
           <strong>Review Requests</strong>
@@ -389,5 +389,20 @@ $pendingCount = $pending ? $pending->num_rows : 0;
     </table>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle smooth scroll links
+    document.querySelectorAll('.scroll-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetId = this.getAttribute('data-target');
+            var target = document.getElementById(targetId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

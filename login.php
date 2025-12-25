@@ -110,9 +110,42 @@ if (preg_match('/^https?:\/\//i', $redirect) || strpos($redirect, '//') === 0) {
 
 <script>
 function switchTab(type) {
+    // Update active tab styling
+    document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+    event.target.closest('.auth-tab').classList.add('active');
+    
+    // Update form elements
     document.getElementById('loginType').value = type;
-    window.location.href = 'login.php?type=' + type;
+    
+    const form = document.getElementById('loginForm');
+    const h2 = form.querySelector('h2');
+    const loginInput = form.querySelector('input[name="login"]');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const helpText = form.querySelector('.help');
+    
+    if (type === 'admin') {
+        h2.textContent = '🛡️ Admin Access';
+        loginInput.placeholder = 'Admin Username or Email';
+        submitBtn.textContent = 'Access Admin Panel';
+        helpText.innerHTML = '🔒 Authorized personnel only';
+        helpText.style.fontSize = '12px';
+    } else {
+        h2.textContent = '🎥 Welcome Back';
+        loginInput.placeholder = 'Email or Username';
+        submitBtn.textContent = 'Sign In';
+        helpText.innerHTML = 'New to CineClick? <a href="register.php">Create Account</a>';
+        helpText.style.fontSize = '14px';
+    }
 }
+
+// Initialize the correct tab on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const loginType = document.getElementById('loginType').value;
+    if (loginType === 'admin') {
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        document.querySelectorAll('.auth-tab')[0].classList.remove('active');
+    }
+});
 </script>
 </body>
 </html>
