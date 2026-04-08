@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can read any user doc when authenticated; write only to own doc or if admin
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId || isAdmin();
+    }
+
+    // Movies: approved visible to all authed users; uploaders can add; admin can edit
+    match /movies/{movieId} {
+      allow read: if request.auth != null &&
+        (resource.data.isApproved == true || isAdmin() || isOwner(resource.data.uploaderId));
+      allow create: if isUploader() || isAdmin();
+      allow update: if isAdmin() || isOwner(resource.data.uploaderId);
+      allow delete: if isAdmin();
+    }
+
+    // Subscriptions: only the subscriber or admin can read/write
+    match /subscriptions/{subId} {
+      allow read, write: if request.auth.uid == subId || isAdmin();
+    }
+
+    // Helper functions
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isUploader() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'uploader';
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+  }
+}
