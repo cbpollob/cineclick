@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/movie_model.dart';
 import '../services/firestore_service.dart';
@@ -9,6 +10,7 @@ class MovieProvider extends ChangeNotifier {
   String _searchQuery = '';
   bool _isLoading = false;
   String? _errorMessage;
+  StreamSubscription<List<MovieModel>>? _moviesSubscription;
 
   List<MovieModel> get movies => _movies;
   bool get isLoading => _isLoading;
@@ -25,8 +27,10 @@ class MovieProvider extends ChangeNotifier {
   }
 
   void listenToApprovedMovies() {
+    _moviesSubscription?.cancel();
     _setLoading(true);
-    _firestoreService.getApprovedMovies().listen(
+    _moviesSubscription =
+        _firestoreService.getApprovedMovies().listen(
       (movies) {
         _movies = movies;
         _setLoading(false);
@@ -47,6 +51,12 @@ class MovieProvider extends ChangeNotifier {
   void clearSearch() {
     _searchQuery = '';
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _moviesSubscription?.cancel();
+    super.dispose();
   }
 
   void _setLoading(bool value) {
